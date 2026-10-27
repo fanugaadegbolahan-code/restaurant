@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-red-50: #faf7f2;
+  --color-red-100: #f1e6d8;
+  --color-red-200: #e6d8c8;
+  --color-red-500: #2c241f;
+  --color-red-600: #1a1614;
+  --color-fuchsia-50: #fffdf9;
+  --color-orange-100: #f6ead7;
+  --color-orange-300: #c6a56a;
+  --color-orange-800: #6d5436;
+  --color-yellow-300: #e4d0a4;
+  --color-green-500: #3e684c;
+}
+
+body {
+  background: #f6f1ea;
+  color: #2c241f;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), "Palatino Linotype", Palatino, serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.uppercase {
+  letter-spacing: 0.16em;
+  font-weight: 500;
+}
+
+.field {
+  width: 100%;
+  border-radius: 0.25rem;
+  border: 1px solid #e4d7c8;
+  background: #fffdf9;
+  padding: 0.7rem 0.85rem;
+  color: #2c241f;
+}
+
+:focus-visible {
+  outline: 2px solid #b08958;
+  outline-offset: 3px;
+}
+
+:is(button, a, label, span).bg-red-500 {
+  border-radius: 999px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: #2c241f;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+:is(button, a, label).bg-red-500:hover {
+  background: #b08958;
+  color: #1a1614;
+}
+
+a.notice-bar {
+  border-radius: 0;
+  background: #1a1411;
+  color: #eadcc0;
+  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+}
+
+a.notice-bar:hover {
+  background: #1a1411;
+  color: #fff8ea;
+}
+
+::selection {
+  background: #e7d3ae;
+  color: #1a1411;
+}
