@@ -6,6 +6,7 @@ import type { Database } from './types'
 const filePath = path.join(process.cwd(), 'data', 'restaurant.json')
 
 let chain: Promise<unknown> = Promise.resolve()
+let memory: Database | null = null
 
 function enqueue<T>(task: () => Promise<T>): Promise<T> {
   const run = chain.then(task, task)
@@ -16,32 +17,44 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
   return run
 }
 
-async function ensureSeed() {
+async function readDb() {
+  if (memory) return memory
   try {
-    await readFile(filePath, 'utf8')
+    return JSON.parse(await readFile(filePath, 'utf8')) as Database
   } catch {
-    await mkdir(path.dirname(filePath), { recursive: true })
-    await writeFile(filePath, JSON.stringify(createSeed(), null, 2))
+    const seed = createSeed()
+    try {
+      await mkdir(path.dirname(filePath), { recursive: true })
+      await writeFile(filePath, JSON.stringify(seed, null, 2))
+      return seed
+    } catch {
+      memory = seed
+      return memory
+    }
   }
 }
 
 async function writeDb(db: Database) {
+  if (memory) {
+    memory = db
+    return
+  }
   const temporary = `${filePath}.tmp`
-  await writeFile(temporary, JSON.stringify(db, null, 2))
-  await rename(temporary, filePath)
+  try {
+    await writeFile(temporary, JSON.stringify(db, null, 2))
+    await rename(temporary, filePath)
+  } catch {
+    memory = db
+  }
 }
 
 export function loadDb() {
-  return enqueue(async () => {
-    await ensureSeed()
-    return JSON.parse(await readFile(filePath, 'utf8')) as Database
-  })
+  return enqueue(async () => JSON.parse(JSON.stringify(await readDb())) as Database)
 }
 
 export function updateDb<T>(mutator: (db: Database) => T | Promise<T>) {
   return enqueue(async () => {
-    await ensureSeed()
-    const db = JSON.parse(await readFile(filePath, 'utf8')) as Database
+    const db = await readDb()
     const result = await mutator(db)
     await writeDb(db)
     return result
